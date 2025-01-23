@@ -277,9 +277,10 @@ const toggleStatus = async (id) => {
                                                     <button
                                                         @click="toggleStatus(student.id)"
                                                         :class="{
-            'text-green-600 hover:text-green-800': student.status,
-            'text-red-600 hover:text-red-800': !student.status
-        }"
+        'bg-blue-600 text-white hover:bg-blue-700': student.status,
+        'bg-gray-600 text-white hover:bg-gray-700': !student.status
+    }"
+                                                        class="px-4 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                                     >
                                                         {{ student.status ? 'Active' : 'Inactive' }}
                                                     </button>
@@ -292,31 +293,30 @@ const toggleStatus = async (id) => {
                                                     }}
                                                 </td>
 
-                                                <td
-                                                    class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
-                                                >
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                    <!-- Edit Button with Icon -->
                                                     <Link
-                                                        :href="
-                                                            route(
-                                                                'students.edit',
-                                                                student.id
-                                                            )
-                                                        "
-                                                        class="text-indigo-600 hover:text-indigo-900"
+                                                        :href="route('students.edit', student.id)"
+                                                        class="text-indigo-600 hover:text-indigo-900 inline-flex items-center"
                                                     >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 3l5 5-10 10H6v-5L16 3z" />
+                                                        </svg>
                                                         Edit
                                                     </Link>
+                                                    &nbsp
+                                                    <!-- Delete Button with Icon -->
                                                     <button
-                                                        @click="
-                                                            deleteStudent(
-                                                                student.id
-                                                            )
-                                                        "
-                                                        class="ml-2 text-indigo-600 hover:text-indigo-900"
+                                                        @click="deleteStudent(student.id)"
+                                                        class="ml-2 text-red-600 hover:text-red-800 inline-flex items-center"
                                                     >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
                                                         Delete
                                                     </button>
                                                 </td>
+
                                             </tr>
                                         </tbody>
                                     </table>
