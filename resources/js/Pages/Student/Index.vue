@@ -1,8 +1,9 @@
 <script setup>
 import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
 import Pagination from "@/Components/Pagination.vue";
+import ConfirmDilogue from "@/Components/ConfirmDilogue.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
+import {Head, Link, router, useForm, usePage} from "@inertiajs/vue3";
 import {ref, watch, computed, onMounted} from "vue";
 import Toast from "@/Components/Toast.vue";
 
@@ -14,9 +15,17 @@ defineProps({
         type: Object,
         required: true,
     },
-    message : {
+    message: {
         type: String,
-        required : true
+        required: true
+    },
+    totalPages: {
+        type: Number,
+        required: true
+    },
+    currentPage: {
+        type: Number,
+        required: true
     }
 });
 
@@ -84,20 +93,21 @@ onMounted(() => {
 const deleteForm = useForm({});
 
 const deleteStudent = (id) => {
-    if (confirm("Are you sure you want to delete this student?")) {
+    //if (confirm("Are you sure you want to delete this student?")) {
         deleteForm.delete(route("students.destroy", id), {
             preserveScroll: true,
             onSuccess: () => {
+                showConfirmDialog.value = false;
                 if (toastRef.value) {
                     toastRef.value.show();
                 }
             }
         });
-    }
+    //}
 };
 const toggleStatus = async (id) => {
     try {
-        if (confirm("Are you sure you want to change this student status ?")) {
+        //if (confirm("Are you sure you want to change this student status ?")) {
             const response = await axios.post(`/students/${id}/toggle-status`);
             if (response.data.success) {
                 toastRef.value = response.data.message;
@@ -107,7 +117,7 @@ const toggleStatus = async (id) => {
                     toastRef.value.show();
                 }
             }
-        }
+       // }
     } catch (error) {
         toastRef.value = 'An error occurred while updating the status.';
         setTimeout(() => {
@@ -116,11 +126,37 @@ const toggleStatus = async (id) => {
     }
 };
 
+const showConfirmDialog = ref(false);
+const showConfirmDialogStatus = ref(false);
+const selectedStudentId = ref(null);
+
+const confirmDelete = (id) => {
+    selectedStudentId.value = id;
+    showConfirmDialog.value = true;
+};
+
+const confirmStatus = (id) => {
+    selectedStudentId.value = id;
+    showConfirmDialogStatus.value = true;
+};
+
 </script>
 
 <template>
-    <Head title="Students" />
+    <Head title="Students"/>
     <Toast v-if="message" ref="toastRef" :message="message"/>
+    <ConfirmDilogue
+        v-if="showConfirmDialog"
+        :message="'Are you sure you want to delete student ?'"
+        @close="showConfirmDialog = false"
+        @confirm="deleteStudent(selectedStudentId)"
+    />
+    <ConfirmDilogue
+        :message="'Are you sure you want to update student status?'"
+        v-if="showConfirmDialogStatus"
+        @close="showConfirmDialogStatus = false"
+        @confirm="toggleStatus(selectedStudentId)"
+    />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -155,15 +191,15 @@ const toggleStatus = async (id) => {
                             <div
                                 class="absolute pl-2 left-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500"
                             >
-                                <MagnifyingGlass />
+                                <MagnifyingGlass/>
                             </div>
 
                             <input
-                                type="text"
-                                v-model="searchTerm"
-                                placeholder="Search students data..."
                                 id="search"
+                                v-model="searchTerm"
                                 class="block rounded-lg border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                placeholder="Search students data..."
+                                type="text"
                             />
                         </div>
 
@@ -173,9 +209,9 @@ const toggleStatus = async (id) => {
                         >
                             <option value="">Filter By Class</option>
                             <option
-                                :value="item.id"
-                                :key="item.id"
                                 v-for="item in classes.data"
+                                :key="item.id"
+                                :value="item.id"
                             >
                                 {{ item.name }}
                             </option>
@@ -196,60 +232,60 @@ const toggleStatus = async (id) => {
                                         class="min-w-full divide-y divide-gray-300"
                                     >
                                         <thead class="bg-gray-50">
-                                            <tr>
-                                                <th
-                                                    scope="col"
-                                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                                                >
-                                                    ID
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                                                >
-                                                    Name
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                                                >
-                                                    Email
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                >
-                                                    Class
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                >
-                                                    Section
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                >
-                                                    Status
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                >
-                                                    Created At
-                                                </th>
-                                                <th
-                                                    scope="col"
-                                                    class="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                                                />
-                                            </tr>
+                                        <tr>
+                                            <th
+                                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                                scope="col"
+                                            >
+                                                ID
+                                            </th>
+                                            <th
+                                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                                scope="col"
+                                            >
+                                                Name
+                                            </th>
+                                            <th
+                                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                                scope="col"
+                                            >
+                                                Email
+                                            </th>
+                                            <th
+                                                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                                scope="col"
+                                            >
+                                                Class
+                                            </th>
+                                            <th
+                                                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                                scope="col"
+                                            >
+                                                Section
+                                            </th>
+                                            <th
+                                                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                                scope="col"
+                                            >
+                                                Status
+                                            </th>
+                                            <th
+                                                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                                scope="col"
+                                            >
+                                                Created At
+                                            </th>
+                                            <th
+                                                class="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                                                scope="col"
+                                            />
+                                        </tr>
                                         </thead>
                                         <tbody
                                             class="divide-y divide-gray-200 bg-white"
                                         >
                                         <!-- Skeleton Loader -->
-                                        <tr v-if="isLoading" v-for="n in 5" :key="n">
+                                        <tr v-for="n in 5" v-if="isLoading" :key="n">
                                             <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
                                                 <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
                                             </td>
@@ -275,85 +311,94 @@ const toggleStatus = async (id) => {
                                                 <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
                                             </td>
                                         </tr>
-                                            <tr v-else
-                                                v-for="student in students.data"
-                                                :key="student.id"
+                                        <tr v-for="student in students.data"
+                                            v-else
+                                            :key="student.id"
+                                        >
+                                            <td
+                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
                                             >
-                                                <td
-                                                    class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                                                {{ student.id }}
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                                            >
+                                                {{ student.name }}
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                            >
+                                                {{ student.email }}
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                            >
+                                                {{ student.class.name }}
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                            >
+                                                {{ student.section.name }}
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                            >
+                                                <button
+                                                    id="statusChangeButton"
+                                                    :class="{
+                                                        'bg-blue-600 text-white hover:bg-blue-700': student.status,
+                                                        'bg-gray-600 text-white hover:bg-gray-700': !student.status
+                                                    }"
+                                                    class="px-4 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                    @click="confirmStatus(student.id)"
                                                 >
-                                                    {{ student.id }}
-                                                </td>
-                                                <td
-                                                    class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
-                                                >
-                                                    {{ student.name }}
-                                                </td>
-                                                <td
-                                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                >
-                                                    {{ student.email }}
-                                                </td>
-                                                <td
-                                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                >
-                                                    {{ student.class.name }}
-                                                </td>
-                                                <td
-                                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                >
-                                                    {{ student.section.name }}
-                                                </td>
-                                                <td
-                                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                >
-                                                    <button
-                                                        @click="toggleStatus(student.id)"
-                                                        :class="{
-        'bg-blue-600 text-white hover:bg-blue-700': student.status,
-        'bg-gray-600 text-white hover:bg-gray-700': !student.status
-    }"
-                                                        class="px-4 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                    >
-                                                        {{ student.status ? 'Active' : 'Inactive' }}
-                                                    </button>
-                                                </td>
-                                                <td
-                                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                >
-                                                    {{
-                                                        student.created_at_formatted
-                                                    }}
-                                                </td>
+                                                    {{ student.status ? 'Active' : 'Inactive' }}
+                                                </button>
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                            >
+                                                {{
+                                                    student.created_at_formatted
+                                                }}
+                                            </td>
 
-                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                                    <!-- Edit Button with Icon -->
-                                                    <Link
-                                                        :href="route('students.edit', student.id)"
-                                                        class="text-indigo-600 hover:text-indigo-900 inline-flex items-center"
-                                                    >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 3l5 5-10 10H6v-5L16 3z" />
-                                                        </svg>
-                                                        Edit
-                                                    </Link>
-                                                    &nbsp
-                                                    <!-- Delete Button with Icon -->
-                                                    <button
-                                                        @click="deleteStudent(student.id)"
-                                                        class="ml-2 text-red-600 hover:text-red-800 inline-flex items-center"
-                                                    >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                        </svg>
-                                                        Delete
-                                                    </button>
-                                                </td>
+                                            <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                <!-- Edit Button with Icon -->
+                                                <Link
+                                                    :href="route('students.edit', student.id)"
+                                                    class="text-indigo-600 hover:text-indigo-900 inline-flex items-center"
+                                                >
+                                                    <svg class="w-5 h-5 mr-2" fill="none"
+                                                         stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M16 3l5 5-10 10H6v-5L16 3z" stroke-linecap="round"
+                                                              stroke-linejoin="round"/>
+                                                    </svg>
+                                                    Edit
+                                                </Link>
+                                                &nbsp
+                                                <!-- Delete Button with Icon -->
+                                                <button
+                                                    id="deleteButton"
+                                                    class="ml-2 text-red-600 hover:text-red-800 inline-flex items-center"
+                                                    @click="confirmDelete(student.id)"
+                                                >
+                                                    <svg class="w-5 h-5 mr-2" fill="none"
+                                                         stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round"
+                                                              stroke-linejoin="round"/>
+                                                    </svg>
+                                                    Delete
+                                                </button>
+                                            </td>
 
-                                            </tr>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
+
                                 <Pagination
                                     :data="students"
                                     :pageNumberUpdated="pageNumberUpdated"

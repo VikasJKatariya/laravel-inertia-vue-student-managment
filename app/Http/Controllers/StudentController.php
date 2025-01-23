@@ -28,6 +28,8 @@ class StudentController extends Controller
             'classes' => $classes,
             'sections' => $sections,
             'message' => $message,
+            'totalPages' => $studentQuery->paginate(5)->total(),
+            'currentPage' => $studentQuery->paginate(5)->currentPage(),
             'search' => request('search') ?? ''
         ]);
     }
