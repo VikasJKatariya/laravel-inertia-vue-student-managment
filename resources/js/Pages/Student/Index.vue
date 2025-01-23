@@ -20,9 +20,15 @@ defineProps({
     }
 });
 
-const messageRef = ref(usePage().props);
-console.log(messageRef)
-console.log('vikas')
+const isLoading = ref(true); // Loading state
+
+onMounted(() => {
+    // Simulate data fetching delay
+    setTimeout(() => {
+        isLoading.value = false; // Stop showing the skeleton loader
+    }, 1000); // Adjust delay as needed
+});
+
 let pageNumber = ref(1),
     searchTerm = ref(usePage().props.search ?? ""),
     class_id = ref(usePage().props.class_id ?? "");
@@ -242,7 +248,34 @@ const toggleStatus = async (id) => {
                                         <tbody
                                             class="divide-y divide-gray-200 bg-white"
                                         >
-                                            <tr
+                                        <!-- Skeleton Loader -->
+                                        <tr v-if="isLoading" v-for="n in 5" :key="n">
+                                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                <div class="h-6 w-16 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                            <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
+                                        </tr>
+                                            <tr v-else
                                                 v-for="student in students.data"
                                                 :key="student.id"
                                             >
