@@ -78,4 +78,20 @@ class StudentController extends Controller
         session()->flash('success', 'Student deleted successfully!');
         return redirect()->route('students.index');
     }
+
+    public function toggleStatus($id)
+    {
+        $student = Student::findOrFail($id);
+        $student->status = !$student->status; // Toggle status
+        $student->save();
+        $status = $student->status ? 'Active' : 'Inactive';
+        session()->flash('success', "Student status updated successfully.");
+
+        return response()->json([
+            'success' => true,
+            'message' => "Student status updated to {$status} successfully.",
+            'status' => $status,
+            'redirect' => route('students.index')
+        ]);
+    }
 }

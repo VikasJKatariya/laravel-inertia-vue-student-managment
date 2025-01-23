@@ -20,7 +20,9 @@ defineProps({
     }
 });
 
-console.log(usePage().props)
+const messageRef = ref(usePage().props);
+console.log(messageRef)
+console.log('vikas')
 let pageNumber = ref(1),
     searchTerm = ref(usePage().props.search ?? ""),
     class_id = ref(usePage().props.class_id ?? "");
@@ -87,6 +89,27 @@ const deleteStudent = (id) => {
         });
     }
 };
+const toggleStatus = async (id) => {
+    try {
+        if (confirm("Are you sure you want to change this student status ?")) {
+            const response = await axios.post(`/students/${id}/toggle-status`);
+            if (response.data.success) {
+                toastRef.value = response.data.message;
+                router.visit(response.data.redirect);
+                console.log(toastRef.value)
+                if (toastRef.value) {
+                    toastRef.value.show();
+                }
+            }
+        }
+    } catch (error) {
+        toastRef.value = 'An error occurred while updating the status.';
+        setTimeout(() => {
+            toastRef.value = '';
+        }, 3000);
+    }
+};
+
 </script>
 
 <template>
@@ -202,6 +225,12 @@ const deleteStudent = (id) => {
                                                     scope="col"
                                                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                                                 >
+                                                    Status
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                                >
                                                     Created At
                                                 </th>
                                                 <th
@@ -241,6 +270,19 @@ const deleteStudent = (id) => {
                                                     class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                                                 >
                                                     {{ student.section.name }}
+                                                </td>
+                                                <td
+                                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                                >
+                                                    <button
+                                                        @click="toggleStatus(student.id)"
+                                                        :class="{
+            'text-green-600 hover:text-green-800': student.status,
+            'text-red-600 hover:text-red-800': !student.status
+        }"
+                                                    >
+                                                        {{ student.status ? 'Active' : 'Inactive' }}
+                                                    </button>
                                                 </td>
                                                 <td
                                                     class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"

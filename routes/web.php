@@ -25,6 +25,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('students', StudentController::class);
+    Route::post('/students/{id}/toggle-status', [StudentController::class, 'toggleStatus'])->name('students.toggle-status');
+
 });
 
 require __DIR__ . '/auth.php';
