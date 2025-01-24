@@ -10,5 +10,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('sections', SectionController::class)->name('sections.index');
+Route::post('students', SectionController::class)->name('student.index');
 Route::post('/students/{id}/toggle-status', [StudentController::class, 'toggleStatus'])->name('students.toggle-status');
 

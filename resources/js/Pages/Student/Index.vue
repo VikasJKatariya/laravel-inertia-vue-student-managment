@@ -6,6 +6,8 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head, Link, router, useForm, usePage} from "@inertiajs/vue3";
 import {ref, watch, computed, onMounted} from "vue";
 import Toast from "@/Components/Toast.vue";
+import { TailwindPagination } from 'laravel-vue-pagination';
+
 
 defineProps({
     students: {
@@ -138,6 +140,30 @@ const confirmDelete = (id) => {
 const confirmStatus = (id) => {
     selectedStudentId.value = id;
     showConfirmDialogStatus.value = true;
+};
+
+const getPosts = (page = 1) => {
+    // Update the page number
+    pageNumber.value = page;
+
+    // Construct the URL with current search and filter parameters
+    const url = new URL(route("students.index"));
+    url.searchParams.set("page", pageNumber.value);
+
+    if (searchTerm.value) {
+        url.searchParams.set("search", searchTerm.value);
+    }
+
+    if (class_id.value) {
+        url.searchParams.append("class_id", class_id.value);
+    }
+
+    // Use Inertia router to visit the constructed URL
+    router.visit(url, {
+        replace: true,
+        preserveState: true,
+        preserveScroll: true,
+    });
 };
 
 </script>
@@ -398,11 +424,18 @@ const confirmStatus = (id) => {
                                         </tbody>
                                     </table>
                                 </div>
-
-                                <Pagination
-                                    :data="students"
-                                    :pageNumberUpdated="pageNumberUpdated"
-                                />
+                                <div class="flex justify-end mt-4">
+                                    <TailwindPagination
+                                        :data="students"
+                                        :limit="1"
+                                        @pagination-change-page="getPosts"
+                                        class="text-right"
+                                    />
+                                </div>
+<!--                                <Pagination-->
+<!--                                    :data="students"-->
+<!--                                    :pageNumberUpdated="pageNumberUpdated"-->
+<!--                                />-->
                             </div>
                         </div>
                     </div>
