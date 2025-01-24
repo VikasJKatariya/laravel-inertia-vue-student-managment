@@ -242,6 +242,18 @@ const getPosts = (page = 1) => {
                                 {{ item.name }}
                             </option>
                         </select>
+
+                        <select
+                            v-model="class_id"
+                            class="block rounded-lg border-0 py-2 ml-5 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+                        >
+                            <option value="">Filter By Page</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
                     </div>
 
                     <div class="mt-8 flex flex-col">
