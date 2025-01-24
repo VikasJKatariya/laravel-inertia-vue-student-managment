@@ -49,7 +49,8 @@ let pageNumber = ref(1),
     class_id = ref(usePage().props.class_id ?? ""),
     per_page = ref(usePage().props.perPage ?? ""),
     column = ref(usePage().props.sort?.column ?? ""),
-    direction = ref(usePage().props.sort?.direction ?? "")
+    direction = ref(usePage().props.sort?.direction ?? ""),
+    status = ref(usePage().props.sort?.status ?? "")
 
 const pageNumberUpdated = (link) => {
     pageNumber.value = link.url.split("=")[1];
@@ -78,6 +79,10 @@ let studentsUrl = computed(() => {
 
     if (direction.value) {
         url.searchParams.append("direction", direction.value);
+    }
+
+    if (status.value) {
+        url.searchParams.append("status", status.value);
     }
 
     if (sortColumn.value) {
@@ -270,6 +275,18 @@ const getPosts = (page = 1) => {
                                 <option value="25">25</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter by Status -->
+                        <div class="flex-1 sm:flex-none">
+                            <select
+                                v-model="status"
+                                class="block w-full sm:w-auto rounded-lg border-0 py-2 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            >
+                                <option value="">Filter By Status</option>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
                             </select>
                         </div>
                     </div>

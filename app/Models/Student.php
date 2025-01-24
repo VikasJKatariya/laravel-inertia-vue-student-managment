@@ -39,6 +39,18 @@ class Student extends Model
                 });
             })->when($request->class_id, function ($query) use ($request) {
                 return $query->where('class_id', $request->class_id);
+            })->when($request->has('sort'), function ($query) use ($request) {
+                $sortColumn = $request->input('sort');
+                $sortDirection = $request->input('direction', 'asc');
+
+                if (in_array($sortColumn, ['name', 'email'])) {
+                    $query->orderBy($sortColumn, $sortDirection);
+                }
+            })->when($request->has('status'), function ($query) use ($request) {
+                $status = $request->input('status');
+                if (in_array($status, [0, 1])) {
+                    $query->where('status', $status);
+                }
             });
         });
     }
