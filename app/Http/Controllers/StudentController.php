@@ -18,6 +18,16 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $studentQuery = Student::search($request);
+
+        $studentQuery->when($request->has('sort'), function ($query) use ($request) {
+            $sortColumn = $request->input('sort');
+            $sortDirection = $request->input('direction', 'asc');
+
+            if (in_array($sortColumn, ['name', 'email'])) {
+                $query->orderBy($sortColumn, $sortDirection);
+            }
+        });
+
         $classes = ClassResource::collection(Classes::all());
         $sections = SectionResource::collection(Section::all());
         $message = session('success');
@@ -31,7 +41,11 @@ class StudentController extends Controller
             'totalPages' => $studentQuery->paginate(5)->total(),
             'currentPage' => $studentQuery->paginate(5)->currentPage(),
             'search' => request('search') ?? '',
-            'perPage' => request('perPage') ?? '5'
+            'perPage' => request('perPage') ?? '5',
+            'sort' => [
+                'column' => $request->input('sort'),
+                'direction' => $request->input('direction')
+            ]
         ]);
     }
 
