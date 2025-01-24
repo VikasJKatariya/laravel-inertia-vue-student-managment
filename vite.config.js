@@ -18,7 +18,7 @@ export default defineConfig({
         }),
     ],
     server: {
-        host: '192.168.1.203',
-        port: 8000
-    }
+        host: '192.168.1.203', // This binds to all available network interfaces
+        port: 8000, // You can change this to your preferred port
+    },
 });

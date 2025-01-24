@@ -7,6 +7,7 @@ import {Head, Link, router, useForm, usePage} from "@inertiajs/vue3";
 import {ref, watch, computed, onMounted} from "vue";
 import Toast from "@/Components/Toast.vue";
 import { TailwindPagination } from 'laravel-vue-pagination';
+import TailwindPaginate from "@/Components/TailwindPaginate.vue";
 
 
 defineProps({
@@ -481,38 +482,7 @@ const getPosts = (page = 1) => {
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="max-w-7xl mx-auto py-6 px-0">
-                                    <div class="max-w-none mx-auto">
-                                        <div class="bg-white overflow-hidden shadow sm:rounded-lg">
-                                            <div
-                                                class="bg-white px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-gray-200 gap-4"
-                                            >
-                                                <!-- Pagination Summary -->
-                                                <div class="text-center sm:text-left">
-                                                    <p class="text-sm text-gray-700">
-                                                        Showing
-                                                        <span class="font-medium">{{ students.meta.from }}</span>
-                                                        to
-                                                        <span class="font-medium">{{ students.meta.to }}</span>
-                                                        of
-                                                        <span class="font-medium">{{ students.meta.total }}</span>
-                                                        results
-                                                    </p>
-                                                </div>
-
-                                                <!-- Pagination Component -->
-                                                <div class="flex justify-center sm:justify-end w-full sm:w-auto">
-                                                    <TailwindPagination
-                                                        :data="students"
-                                                        :limit="1"
-                                                        @pagination-change-page="getPosts"
-                                                        class="text-sm"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <TailwindPaginate :students="students" :getPosts="getPosts"></TailwindPaginate>
                             </div>
                         </div>
                     </div>
