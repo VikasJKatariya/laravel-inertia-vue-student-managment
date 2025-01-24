@@ -23,14 +23,15 @@ class StudentController extends Controller
         $message = session('success');
         return inertia('Student/Index', [
             'students' => StudentResource::collection(
-                $studentQuery->paginate(5)
+                $studentQuery->paginate(request('perPage') ?? 5)
             ),
             'classes' => $classes,
             'sections' => $sections,
             'message' => $message,
             'totalPages' => $studentQuery->paginate(5)->total(),
             'currentPage' => $studentQuery->paginate(5)->currentPage(),
-            'search' => request('search') ?? ''
+            'search' => request('search') ?? '',
+            'perPage' => request('perPage') ?? '5'
         ]);
     }
 

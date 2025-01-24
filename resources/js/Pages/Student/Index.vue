@@ -40,9 +40,12 @@ onMounted(() => {
     }, 1000); // Adjust delay as needed
 });
 
+console.log(usePage().props.perPage);
+
 let pageNumber = ref(1),
     searchTerm = ref(usePage().props.search ?? ""),
-    class_id = ref(usePage().props.class_id ?? "");
+    class_id = ref(usePage().props.class_id ?? ""),
+    per_page = ref(usePage().props.perPage ?? "");
 
 const pageNumberUpdated = (link) => {
     pageNumber.value = link.url.split("=")[1];
@@ -59,6 +62,10 @@ let studentsUrl = computed(() => {
 
     if (class_id.value) {
         url.searchParams.append("class_id", class_id.value);
+    }
+
+    if (per_page.value) {
+        url.searchParams.append("perPage", per_page.value);
     }
 
     return url;
@@ -211,50 +218,56 @@ const getPosts = (page = 1) => {
                             </Link>
                         </div>
                     </div>
-
-                    <div class="flex flex-col justify-start sm:flex-row mt-6">
-                        <div class="relative text-sm text-gray-800 col-span-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
+                        <!-- Search Input -->
+                        <div class="relative flex-1 text-sm text-gray-800">
                             <div
                                 class="absolute pl-2 left-0 top-0 bottom-0 flex items-center pointer-events-none text-gray-500"
                             >
-                                <MagnifyingGlass/>
+                                <MagnifyingGlass />
                             </div>
-
                             <input
                                 id="search"
                                 v-model="searchTerm"
-                                class="block rounded-lg border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                class="block w-full rounded-lg border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 placeholder="Search students data..."
                                 type="text"
                             />
                         </div>
 
-                        <select
-                            v-model="class_id"
-                            class="block rounded-lg border-0 py-2 ml-5 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-                        >
-                            <option value="">Filter By Class</option>
-                            <option
-                                v-for="item in classes.data"
-                                :key="item.id"
-                                :value="item.id"
+                        <!-- Filter by Class -->
+                        <div class="flex-1 sm:flex-none">
+                            <select
+                                v-model="class_id"
+                                class="block w-full sm:w-auto rounded-lg border-0 py-2 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                                {{ item.name }}
-                            </option>
-                        </select>
+                                <option value="">Filter By Class</option>
+                                <option
+                                    v-for="item in classes.data"
+                                    :key="item.id"
+                                    :value="item.id"
+                                >
+                                    {{ item.name }}
+                                </option>
+                            </select>
+                        </div>
 
-                        <select
-                            v-model="class_id"
-                            class="block rounded-lg border-0 py-2 ml-5 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-                        >
-                            <option value="">Filter By Page</option>
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                        <!-- Filter by Page -->
+                        <div class="flex-1 sm:flex-none">
+                            <select
+                                v-model="per_page"
+                                class="block w-full sm:w-auto rounded-lg border-0 py-2 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            >
+                                <option value="">Filter By Page</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
                     </div>
+
 
                     <div class="mt-8 flex flex-col">
                         <div
@@ -433,21 +446,46 @@ const getPosts = (page = 1) => {
                                             </td>
 
                                         </tr>
+                                        <tr v-if="!isLoading && students.data.length === 0">
+                                            <td colspan="8" class="text-center py-4 text-gray-500">
+                                                No students found
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="flex justify-end mt-4">
-                                    <TailwindPagination
-                                        :data="students"
-                                        :limit="1"
-                                        @pagination-change-page="getPosts"
-                                        class="text-right"
-                                    />
+                                <div class="max-w-7xl mx-auto py-6 px-0">
+                                    <div class="max-w-none mx-auto">
+                                        <div class="bg-white overflow-hidden shadow sm:rounded-lg">
+                                            <div
+                                                class="bg-white px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-gray-200 gap-4"
+                                            >
+                                                <!-- Pagination Summary -->
+                                                <div class="text-center sm:text-left">
+                                                    <p class="text-sm text-gray-700">
+                                                        Showing
+                                                        <span class="font-medium">{{ students.meta.from }}</span>
+                                                        to
+                                                        <span class="font-medium">{{ students.meta.to }}</span>
+                                                        of
+                                                        <span class="font-medium">{{ students.meta.total }}</span>
+                                                        results
+                                                    </p>
+                                                </div>
+
+                                                <!-- Pagination Component -->
+                                                <div class="flex justify-center sm:justify-end w-full sm:w-auto">
+                                                    <TailwindPagination
+                                                        :data="students"
+                                                        :limit="1"
+                                                        @pagination-change-page="getPosts"
+                                                        class="text-sm"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-<!--                                <Pagination-->
-<!--                                    :data="students"-->
-<!--                                    :pageNumberUpdated="pageNumberUpdated"-->
-<!--                                />-->
                             </div>
                         </div>
                     </div>
