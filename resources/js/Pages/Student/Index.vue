@@ -186,6 +186,18 @@ const getPosts = (page = 1) => {
     pageNumber.value = page;
 };
 
+const showModal = ref(false);
+const modalImage = ref('');
+
+const openImage = (imageSrc) => {
+    modalImage.value = imageSrc;
+    showModal.value = true;
+};
+
+const closeImage = () => {
+    showModal.value = false;
+};
+
 </script>
 
 <template>
@@ -315,6 +327,12 @@ const getPosts = (page = 1) => {
                                                 ID
                                             </th>
                                             <th
+                                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                                scope="col"
+                                            >
+                                                Image
+                                            </th>
+                                            <th
                                                 @click="sort('name')"
                                                 class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
                                                 scope="col"
@@ -371,6 +389,9 @@ const getPosts = (page = 1) => {
                                             <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
                                                 <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
                                             </td>
+                                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                                                <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
+                                            </td>
                                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                 <div class="h-4 bg-gray-200 rounded-md animate-pulse"></div>
                                             </td>
@@ -398,6 +419,24 @@ const getPosts = (page = 1) => {
                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
                                             >
                                                 {{ student.id }}
+                                            </td>
+                                            <td
+                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
+                                            >
+                                                <!-- Student Image -->
+                                                <img
+                                                    v-if="student.profile_image"
+                                                    :src="student.profile_image"
+                                                    alt="Student Image"
+                                                    class="w-12 h-12 rounded-full object-cover"
+                                                    @click="openImage(student.profile_image)"
+                                                />
+                                                <img
+                                                    v-else
+                                                    src="/path/to/default-image.jpg"
+                                                    alt="Default Image"
+                                                    class="w-12 h-12 rounded-full object-cover"
+                                                />
                                             </td>
                                             <td
                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
@@ -490,4 +529,27 @@ const getPosts = (page = 1) => {
             </div>
         </div>
     </AuthenticatedLayout>
+
+    <!-- Modal for Full-Size Image -->
+    <div
+        v-if="showModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+    >
+        <div class="relative">
+            <!-- Close Button -->
+            <button
+                @click="closeImage"
+                class="absolute top-2 right-2 text-white bg-gray-800 rounded-full p-2 hover:bg-gray-700 focus:outline-none"
+            >
+                ✕
+            </button>
+
+            <!-- Full-Size Image -->
+            <img
+                :src="modalImage"
+                alt="Full Image"
+                class="max-w-full max-h-screen rounded-lg shadow-lg"
+            />
+        </div>
+    </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import {Head, Link, router, useForm, usePage} from "@inertiajs/vue3";
 import { watch, ref, onMounted } from "vue";
 import axios from "axios";
 import InputError from "@/Components/InputError.vue";
@@ -19,7 +19,14 @@ const form = useForm({
     email: student.data.email,
     class_id: student.data.class_id,
     section_id: student.data.section_id,
+    _method: 'PUT',
+    image: null,
 });
+
+const currentImage = ref(student.data.profile_image);
+
+const newImage = ref(null);
+
 
 watch(
     () => form.class_id,
@@ -38,9 +45,36 @@ const getSections = (class_id) => {
     });
 };
 
+const imagePreview = ref(null); // To store the preview image
+
+// Handle file change manually
+const handleImageChange = (event) => {
+    const file = event.target.files[0]; // Get the first file selected
+    form.image = file ? file : null; // Store the file in form.image
+    if (file) {
+        newImage.value = file;
+        const reader = new FileReader();
+        reader.onload = () => {
+            imagePreview.value = reader.result; // Set the image preview
+        };
+        reader.readAsDataURL(file);
+    } else {
+        imagePreview.value = null; // Reset preview if no file selected
+    }
+};
+const toastRef = ref(null);
+
 const submit = () => {
-    form.put(route("students.update", student.data.id), {
-        preserveScroll: true,
+    // Use Inertia's form.post method
+    form.post(route("students.update", student.data.id), {
+        onSuccess: () => {
+            if (toastRef.value && typeof toastRef.value.show === 'function') {
+                toastRef.value.show('Form submitted successfully!');
+            }
+        },
+        onError: (errors) => {
+            console.error(errors);
+        },
     });
 };
 </script>
@@ -179,6 +213,35 @@ const submit = () => {
                                             :message="form.errors.section_id"
                                         />
                                     </div>
+
+                                    <!-- Image Field -->
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label
+                                            for="image"
+                                            class="block text-sm font-medium text-gray-700"
+                                        >Student Image</label
+                                        >
+                                        <input
+                                            type="file"
+                                            id="image"
+                                            accept="image/*"
+                                            @change="handleImageChange"
+                                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        />
+                                        <InputError
+                                            class="mt-2"
+                                            :message="form.errors.image"
+                                        />
+                                    </div>
+
+                                    <!-- Display Image (if any) -->
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label class="block text-sm font-medium text-gray-700">Image Preview</label>
+                                        <div v-if="student.data.profile_image || imagePreview">
+                                            <img :src="imagePreview || student.data.profile_image"  alt="Image Preview" class="mt-2 rounded-md w-32 h-32 object-cover" />
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                             <div

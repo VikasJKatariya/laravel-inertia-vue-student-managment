@@ -25,6 +25,8 @@ class StudentResource extends JsonResource
             'section' => SectionResource::make($this->section),
             'created_at_formatted' => $this->created_at->toFormattedDateString(),
             'updated_at_formatted' => $this->updated_at->toFormattedDateString(),
+            'profile_image' => $this->image ? asset($this->image) : asset('storage/images/img.png'), // Adjust as needed
+
         ];
     }
 }

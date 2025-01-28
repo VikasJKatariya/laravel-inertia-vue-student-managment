@@ -12,6 +12,7 @@ use App\Http\Resources\StudentResource;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -57,7 +58,13 @@ class StudentController extends Controller
 
     public function store(StoreStudentRequest $request)
     {
-        Student::create($request->validated());
+        $validatedData = $request->validated();
+        // Store the image if it exists
+        if ($request->hasFile('image')) {
+            $validatedData['image'] = Storage::url($request->file('image')->store('public/images'));
+        }
+
+        Student::create($validatedData);
         session()->flash('success', 'Student created successfully!');
         return redirect()->route('students.index');
     }
@@ -74,7 +81,11 @@ class StudentController extends Controller
 
     public function update(UpdateStudentRequest $request, Student $student)
     {
-        $student->update($request->validated());
+        $validatedData = $request->validated();
+        if ($request->hasFile('image')) {
+            $validatedData['image'] = Storage::url($request->file('image')->store('public/images'));
+        }
+        $student->update($validatedData);
         session()->flash('success', 'Student updated successfully!');
         return redirect()->route('students.index');
     }

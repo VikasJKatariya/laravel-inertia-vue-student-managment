@@ -21,6 +21,7 @@ const form = useForm({
     email: "",
     class_id: "",
     section_id: "",
+    image: "",
 });
 
 watch(
@@ -74,6 +75,21 @@ const submit = () => {
             }
         },
     });
+};
+
+const imagePreview = ref(null); // To store the preview image
+
+// Handle file change manually
+const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the first file selected
+    form.image = file; // Store the file in form.image
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            imagePreview.value = reader.result; // Set the image preview
+        };
+        reader.readAsDataURL(file);
+    }
 };
 </script>
 
@@ -213,6 +229,26 @@ const submit = () => {
                                             :message="form.errors.section_id"
                                         />
                                     </div>
+
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
+                                        <input
+                                            type="file"
+                                            id="image"
+                                            accept="image/*"
+                                            @change="handleFileChange"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        :class="{'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300': form.errors.image}"
+                                        />
+                                        <InputError class="mt-2" :message="form.errors.image" />
+                                    </div>
+
+                                    <!-- Preview Image -->
+                                    <div v-if="imagePreview" class="col-span-6 sm:col-span-3">
+                                        <label class="block text-sm font-medium text-gray-700">Image Preview</label>
+                                        <img :src="imagePreview" alt="Image Preview" class="mt-2 rounded-md w-32 h-32 object-cover" />
+                                    </div>
+
                                 </div>
                             </div>
                             <div

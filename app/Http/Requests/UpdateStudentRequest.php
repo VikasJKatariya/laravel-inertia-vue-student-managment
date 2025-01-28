@@ -29,6 +29,14 @@ class UpdateStudentRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation()
+    {
+        // If no new image is uploaded, don't validate the image field
+        if (!$this->hasFile('image')) {
+            $this->request->remove('image');
+        }
+    }
+
     public function attributes()
     {
         return [
@@ -37,5 +45,6 @@ class UpdateStudentRequest extends FormRequest
             'class_id' => 'class',
             'section_id' => 'section',
         ];
+
     }
 }

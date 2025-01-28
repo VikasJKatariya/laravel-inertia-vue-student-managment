@@ -16,7 +16,8 @@ class Student extends Model
         'email',
         'class_id',
         'section_id',
-        'status'
+        'status',
+        'image'
     ];
 
     public function class()

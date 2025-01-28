@@ -26,6 +26,7 @@ class StoreStudentRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', 'unique:students,email'],
             'class_id' => ['required', 'exists:classes,id'],
             'section_id' => ['required', 'exists:sections,id'],
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate image
         ];
     }
 
